@@ -1,0 +1,27 @@
+{
+  "name": "erp-server",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "1. 백엔드 세팅 : 데이터베이스 세팅, 웹소켓 세팅  \r // 백엔드는 받아온 정보를 저장하는 역할\r // 프론트엔드느 유저에게 데이터를 받아오는 역할",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "http": "^0.0.1-security",
+    "mariadb": "^3.4.0",
+    "mysql2": "^3.11.5",
+    "nodemon": "^3.1.7",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "socket.io": "^4.8.1",
+    "zustand": "^5.0.2"
+  }
+}
