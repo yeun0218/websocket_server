@@ -4,36 +4,13 @@ import db from "../utils/db.js"; // 데이터베이스 연결 모듈 가져오�
 const chatController = {
     // 메시지 저장 함수
     saveChatMessage: async (messageData) => {
-        const { sender_id,sender_tel, sender_type, message } = messageData;
+        const { room_id,sender_tel, sender_type, message } = messageData;
 
-        try {
-            // 고객 메시지 처리 (전화번호 사용)
-            if (sender_type === 'customer' && sender_tel) {
-                const query = `
-                    INSERT INTO chat_messages (message, sender_tel, sender_type) 
-                    VALUES (?, ?, 'customer')
-                `;
-                const params = [message, sender_tel];
-                const [result] = await db.execute(query, params);
-                return { id: result.insertId, ...messageData, created_at: new Date() };
-            }
-            
-            // 상담원 메시지 처리 (아이디 사용)
-            else if (sender_type === 'branch' && sender_id) {
-                const query = `
-                    INSERT INTO chat_messages (message, sender_id, sender_type) 
-                    VALUES (?, ?, 'branch')
-                `;
-                const params = [message, sender_id];
-                const [result] = await db.execute(query, params);
-                return { id: result.insertId, ...messageData, created_at: new Date() };
-            } else {
-                throw new Error("Invalid data: Sender type or ID is missing");
-            }
-        } catch (error) {
-            console.error("Error saving chat message:", error);
-            throw error;
-        }
+        const query = `
+            INSERT INTO chat_messages (room_id, sender_tel, sender_type, message, created_at)
+            VALUES (?, ?, ?, ?, NOW())`;
+        const [result] = await db.query(query, [room_id, sender_tel, sender_type, message]);
+        return { id: result.insertId, room_id, sender_tel, sender_type, message };
     },
 
     // 고객 ID로 메시지 이력 조회

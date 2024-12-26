@@ -10,7 +10,15 @@ const branchController = {
             throw new Error(`Branch with code ${branchCode} not found`);
         }
         return rows[0];  // 브랜치 정보 반환
+    },
+
+    getAllBranches : async () => {
+        // MariaDB 예시 쿼리
+    const query = "SELECT * FROM branch"; 
+    const [rows] = await db.execute(query);
+    return rows;
     }
+
 };
 
 export default branchController;

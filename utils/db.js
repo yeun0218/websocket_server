@@ -11,11 +11,20 @@ const db = mysql.createPool({
     queueLimit: 0,
 });
 
-db.on("error", (err) => {
-    console.error("Database error", err);
-    if(err.code === "protodol_connection_lost") {
-        db = mysql.createPool(db.config);
-        console.log("reconnected to the db");
+// 연결 확인 함수
+const testConnection = async () => {
+    try {
+        const connection = await db.getConnection();
+        console.log("Database connection successful");
+        connection.release(); // 연결 반환
+    } catch (error) {
+        console.error("Database connection failed", error);
+        process.exit(1); // 심각한 오류일 경우 프로세스 종료
     }
-});
+};
+
+// 서버 시작 시 연결 확인
+testConnection();
+
 export default db;
+

@@ -1,40 +1,42 @@
-import chatController from "./chat.controller.js";
+import db from "../utils/db.js"; // DB 연결 파일
+import RoomModel from "../Models/room.js"; 
 
-
-const roomController = {
-
- createRoom : async (data, cb) => {
-    const { customerTel, branchCode} = data;
-
+const createOrFindRoom = async ({ branchCode, customerTel }) => {
     try {
-        const room = await chatController.findOrCreateRoom(customerTel, branchCode);
-        cb({ ok: true, data: room});
-    } catch (error) {
-        console.error("Error creating room : ", error);
-        cb({ok:false, error: error.message})
-    }
- },
+        // 채팅방 찾기
+        let room = await RoomModel.find({ branchCode, customerTel });
+        if (!room) {
+            // 채팅방이 없으면 새로 생성
+            room = await RoomModel.create({ branchCode, customerTel });
+            room = {  branch_code: branchCode, customer_tel: customerTel };
 
- getRoomsByBranch : async(branchCode, cb) => {
+        }
+        return { ok: true, data: room };
+    } catch (error) {
+        console.error("Error in createOrFindRoom:", error);
+        return { ok: false, error: error.message };
+    }
+};
+
+const getRoomsByBranch = async (branchCode) => {
     try {
-        const rooms = await chatController.getRoomsByBranch(branchCode);
-        cb({ok:true, data:rooms})
+        console.log("Fetching rooms for branch code:", branchCode); // 디버깅 로그
+        const rooms = await RoomModel.findByBranch(branchCode);
+        return rooms;
     } catch (error) {
-        console.error("Error fetchig rooms : ", error);
-        cb({ok:false, error:error.message});
+        console.error("Error in getRoomsByBranch:", error);
+        throw new Error("지점 채팅방 목록 조회 중 문제가 발생했습니다.");
     }
- },
+};
 
- getMessagesByRoom : async (roomId, cb) => {
-    try {
-        const messages = await chatController.getMessagesByRoom(roomId);
-        cb({ok:true, data:messages});
-    } catch (error) {
-        console.error("Error fetching messages : ", error);
-        cb({ok:false, error:error.message})
-    }
- }
+const findByCustomerTel = async (customerTel) => {
+    const query = `
+            SELECT * FROM chat_rooms
+            WHERE customer_tel = ?`;
+        const [rows] = await db.query(query, [customerTel]);
+        return rows[0]; // 방이 존재하면 첫 번째 결과 반환
+};
 
 
-}
-export default roomController;
+
+export default { createOrFindRoom, getRoomsByBranch, findByCustomerTel};
